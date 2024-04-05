@@ -1,0 +1,25 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+directive @upper on FIELD_DEFINITION
+
+type User {
+  id: Float!
+  email: String!
+  biometricKey: String!
+}
+
+type Query {
+  sayHello: String!
+}
+
+type Mutation {
+  createUser(input: CreateUserDto!): User!
+}
+
+input CreateUserDto {
+  email: String!
+  password: String!
+  biometricKey: String
+}

@@ -1,0 +1,24 @@
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  login(email: String!, password: String!): String!
+  biometricLogin(biometricKey: String!): String!
+}
+
+type Query {
+  sayHello: String!
+  Users:[User!]
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  biometricKey: String
+}
+
+type User {
+  id: ID!
+  email: String!
+  passwors: String!
+  biometricKey: String
+  
+}
