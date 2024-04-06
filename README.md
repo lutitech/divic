@@ -63,6 +63,7 @@ The application provides CRUD operations for managing users. You can use GraphQL
 }`
 
 Authentication
+
 To authenticate a user, you can use the login mutation in GraphQL Playground:
 
 Standard login:
@@ -80,7 +81,7 @@ Biometric login:
 This will return a JWT token, which can be used for further authenticated requests
 
 
-Contributing
+### Contributing
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
 License
