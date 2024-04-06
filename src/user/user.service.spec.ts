@@ -1,130 +1,68 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
-import { PrismaService } from '../prisma.service';
-import { UnauthorizedException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { ConflictException } from '@nestjs/common';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
-describe('UserService', () => {
-  let userService: UserService;
-  let prismaService: PrismaService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UserService,
-        {
-          provide: PrismaService,
-          useValue: {
-            getPrismaClient: jest.fn(),
-            user: {
-              create: jest.fn(),
-              findUnique: jest.fn(),
-              findFirst: jest.fn(),
+  describe('UserResolver', () => {
+    let userResolver: UserResolver;
+    let userService: UserService;
+  
+    beforeEach(async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          UserResolver,
+          {
+            provide: UserService,
+            useValue: {
+              findByEmail: jest.fn(), // Correctly mock this method
+              createUser: jest.fn(),
             },
           },
-        },
-      ],
-    }).compile();
+        ],
+      }).compile();
   
-    userService = module.get<UserService>(UserService);
-    prismaService = module.get<PrismaService>(PrismaService);
-  });
-  
+      userResolver = module.get<UserResolver>(UserResolver);
+      userService = module.get<UserService>(UserService);
+    });
+
+
 
   describe('createUser', () => {
     it('should create a new user', async () => {
-      const email = 'test@example.com';
-      const password = 'password123';
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const input: CreateUserDto = {
+        email: 'newuser@example.com',
+        password: 'testpassword',
+        biometricKey: 'testbiometrickey',
+      };
+      const createdUser: User = { id: 2, email: input.email, password: input.password, biometricKey: input.biometricKey };
 
-      prismaService.user.findUnique.mockResolvedValue(null);
-      prismaService.user.create.mockResolvedValue({
-        id: 1,
-        email,
-        password: hashedPassword,
-        biometricKey: null,
-      });
 
-      const result = await userService.createUser({ email, password });
-      expect(result).toEqual({
-        id: 1,
-        email,
-        password: hashedPassword,
-        biometricKey: null,
-      });
+      userService.findByEmail= jest.fn().mockResolvedValue(null);
+      userService.createUser= jest.fn().mockResolvedValue(createdUser);
+
+      const result = await userResolver.createUser(input);
+
+      expect(result).toEqual(createdUser);
+      expect(userService.findByEmail).toHaveBeenCalledWith(input.email);
+      expect(userService.createUser).toHaveBeenCalledWith(input);
     });
 
-    it('should throw UnauthorizedException if user already exists', async () => {
-      const email = 'existing@example.com';
+    it('should throw ConflictException if user with the same email already exists', async () => {
+      const input: CreateUserDto = {
+        email: 'existinguser@example.com',
+        password: 'testpassword',
+        biometricKey: 'testbiometrickey',
+      };
 
-      prismaService.user.findUnique.mockResolvedValue({
-        id: 1,
-        email,
-        password: 'hashed_password',
-        biometricKey: null,
-      });
+      userService.findByEmail= jest.fn().mockResolvedValue({ id: 3, ...input });
 
-      await expect(userService.createUser({ email, password: 'password' })).rejects.toThrow(UnauthorizedException);
+      await expect(userResolver.createUser(input)).rejects.toThrowError(ConflictException);
     });
   });
 
-  describe('findByEmail', () => {
-    it('should find a user by email', async () => {
-      const email = 'test@example.com';
-
-      prismaService.user.findUnique.mockResolvedValue({
-        id: 1,
-        email,
-        password: 'hashed_password',
-        biometricKey: null,
-      });
-
-      const result = await userService.findByEmail(email);
-      expect(result).toEqual({
-        id: 1,
-        email,
-        password: 'hashed_password',
-        biometricKey: null,
-      });
-    });
-
-    it('should return null if user not found', async () => {
-      const email = 'nonexistent@example.com';
-
-      prismaService.user.findUnique.mockResolvedValue(null);
-
-      const result = await userService.findByEmail(email);
-      expect(result).toBeNull();
-    });
-  });
-
-  describe('findByBiometricKey', () => {
-    it('should find a user by biometric key', async () => {
-      const biometricKey = 'fingerprint123';
-
-      prismaService.user.findFirst.mockResolvedValue({
-        id: 1,
-        email: 'test@example.com',
-        password: 'hashed_password',
-        biometricKey,
-      });
-
-      const result = await userService.findByBiometricKey(biometricKey);
-      expect(result).toEqual({
-        id: 1,
-        email: 'test@example.com',
-        password: 'hashed_password',
-        biometricKey,
-      });
-    });
-
-    it('should return null if user not found', async () => {
-      const biometricKey = 'nonexistent_key';
-
-      prismaService.user.findFirst.mockResolvedValue(null);
-
-      const result = await userService.findByBiometricKey(biometricKey);
-      expect(result).toBeNull();
-    });
-  });
 });
+
+

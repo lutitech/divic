@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(public readonly prisma: PrismaService) {}
 
   /**
    * Creates a new user.
@@ -14,19 +14,28 @@ export class UserService {
    * @throws UnauthorizedException if a user with the same email already exists.
    */
   async createUser({ email, password, biometricKey }: Partial<User>): Promise<User> {
-    const existingUser = await this.findByEmail(email);
-    if (existingUser) {
-      throw new UnauthorizedException('User already exists');
+    try {
+      const existingUser = await this.findByEmail(email);
+      if (existingUser) {
+        throw new UnauthorizedException('User already exists');
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const createdUser = await this.prisma.getPrismaClient().user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          biometricKey,
+        },
+      });
+      return createdUser;
+    } catch (error) {
+      // Log the error for debugging purposes
+      console.error('Error in createUser:', error);
+      // Throw the error to propagate it further
+      throw error;
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return await this.prisma.getPrismaClient().user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        biometricKey,
-      },
-    });
   }
+  
 
   /**
    * Finds a user by email.
