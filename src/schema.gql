@@ -5,8 +5,7 @@ type Mutation {
 }
 
 type Query {
-  sayHello: String!
-  Users:[User!]
+   findUserByEmail(email: String!): User
 }
 
 input CreateUserInput {

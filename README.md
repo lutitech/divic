@@ -1,73 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+NestJS GraphQL Application
+This is a sample NestJS application with GraphQL integration. It provides endpoints for user authentication and user management using GraphQL.
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Getting Started
+Prerequisites
+Before running the application, ensure you have the following installed:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Node.js and npm (or yarn)
+PostgreSQL (or any other supported database)
+Installation
+Clone the repository:
 
-## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+git clone <repository-url>
+Install dependencies:
 
-## Installation
 
-```bash
-$ npm install
-```
+cd <project-folder>
+npm install
+Configuration
+Create a .env file in the root directory of the project.
 
-## Running the app
+Add the following environment variables to the .env file:
 
-```bash
-# development
-$ npm run start
 
-# watch mode
-$ npm run start:dev
+DATABASE_URL=postgres://<username>:<password>@localhost:5432/<database-name>
+JWT_SECRET=your_jwt_secret_here
+Replace <username>, <password>, and <database-name> with your PostgreSQL credentials and database name. Also, provide a secret key for JWT token generation.
 
-# production mode
-$ npm run start:prod
-```
+Running the Application
+Run the database migrations:
 
-## Test
 
-```bash
-# unit tests
-$ npm run test
+npx prisma migrate dev
+Start the server:
 
-# e2e tests
-$ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
-```
+npm run start
+The server should now be running at http://localhost:3000/graphql. You can access the GraphQL Playground to test the API.
 
-## Support
+Usage
+Authentication
+To authenticate a user, you can use the login mutation in GraphQL Playground:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+standard login
+mutation {
+  login(email: "example@example.com", password: "password")
+}
 
-## Stay in touch
+mutation {
+  biometricLogin(biometricKey: "fingerprint") 
+}
+This will return a JWT token, which can be used for further authenticated requests.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+User Management
+The application provides CRUD operations for managing users. You can use GraphQL queries and mutations to perform these operations. Here are some examples:
 
-## License
+Create a new user:
 
-Nest is [MIT licensed](LICENSE).
+mutation {
+  createUser(input: {
+    email: "newuser@example.com",
+    password: "password123",
+    biometricKey: "fingerprint"
+  }) {
+    id
+    email
+    biometricKey
+  }
+}
+
+
+Contributing
+Contributions are welcome! Feel free to open issues or submit pull requests.
+
+License
+This project is licensed under the MIT License - see the LICENSE file for details
