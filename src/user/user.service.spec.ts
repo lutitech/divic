@@ -57,7 +57,7 @@ import { CreateUserDto } from './dto/create-user.dto';
         biometricKey: 'testbiometrickey',
       };
 
-      userService.findByEmail= jest.fn().mockResolvedValue({ id: 3, ...input });
+      userService.findByEmail= jest.fn().mockResolvedValue({ id: 2, ...input });
 
       await expect(userResolver.createUser(input)).rejects.toThrowError(ConflictException);
     });

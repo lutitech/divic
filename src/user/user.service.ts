@@ -5,59 +5,62 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(public readonly prisma: PrismaService) {}
+  // Constructor to inject PrismaService
+  constructor(
+    private readonly prisma: PrismaService,
+  ) {}
 
-  /**
-   * Creates a new user.
-   * @param user - The user data including email, password, and optional biometric key.
-   * @returns The created user.
-   * @throws UnauthorizedException if a user with the same email already exists.
-   */
+  // Create a new user
   async createUser({ email, password, biometricKey }: Partial<User>): Promise<User> {
     try {
+      // Check if user with the email already exists
       const existingUser = await this.findByEmail(email);
       if (existingUser) {
         throw new UnauthorizedException('User already exists');
       }
+      // Hash the password before storing it
       const hashedPassword = await bcrypt.hash(password, 10);
+      // Create the user in the database
       const createdUser = await this.prisma.getPrismaClient().user.create({
         data: {
           email,
           password: hashedPassword,
-          biometricKey,
+          biometricKey: biometricKey,
         },
       });
       return createdUser;
     } catch (error) {
-      // Log the error for debugging purposes
       console.error('Error in createUser:', error);
-      // Throw the error to propagate it further
       throw error;
     }
   }
-  
 
-  /**
-   * Finds a user by email.
-   * @param email - The user's email.
-   * @returns The user if found, otherwise null.
-   */
+  // Find a user by their email
   async findByEmail(email: string): Promise<User | null> {
-    const user = await await this.prisma.getPrismaClient().user.findUnique({
-      where: { email },
-    });
-    return user;
+    try {
+      // Query the database for the user with the specified email
+      const user = await this.prisma.getPrismaClient().user.findUnique({
+        where: { email },
+      });
+      return user;
+    } catch (error) {
+      console.error('Error in findByEmail:', error);
+      throw error;
+    }
   }
 
-  /**
-   * Finds a user by biometric key.
-   * @param biometricKey - The user's biometric key.
-   * @returns The user if found, otherwise null.
-   */
+  // Find a user by their biometric key
   async findByBiometricKey(biometricKey: string): Promise<User | null> {
-    const user = await this.prisma.getPrismaClient().user.findFirst({
-      where: { biometricKey },
-    });
-    return user;
+    try {
+      // Query the database using the decrypted biometric key
+      const user = await this.prisma.getPrismaClient().user.findFirst({
+        where: { biometricKey: biometricKey },
+      });
+      return user;
+    } catch (error) {
+      console.error('Error in findByBiometricKey:', error);
+      throw new UnauthorizedException('Invalid biometric credentials');
+    }
   }
+  
 }

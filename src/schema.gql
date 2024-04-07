@@ -1,23 +1,22 @@
 type Mutation {
-  createUser(input: CreateUserInput!): User!
-  login(email: String!, password: String!): String!
-  biometricLogin(biometricKey: String!): String!
+  createUser(input: CreateUserInput!): User!
+  login(email: String!, password: String!): String!
+  biometricLogin(biometricKey: String!): String!
 }
 
 type Query {
-   findUserByEmail(email: String!): User
+  findUserByEmail(email: String!): User
 }
 
 input CreateUserInput {
-  email: String!
-  password: String!
-  biometricKey: String
+  email: String!
+  password: String!
+  biometricKey: String
 }
 
 type User {
-  id: ID!
-  email: String!
-  passwors: String!
-  biometricKey: String
-  
+  id: ID!
+  email: String!
+  password: String!
+  biometricKey: String
 }
