@@ -29,14 +29,15 @@ Create a .env file in the root directory of the project.
 
 Add the following environment variables to the .env file:
 
-DATABASE_URL=postgres://<username>:<password>@localhost:5432/<database-name>
-JWT_SECRET=your_jwt_secret_here
+`DATABASE_URL=postgres://<username>:<password>@localhost:5432/<database-name>
+
+JWT_SECRET=your_jwt_secret_here`
 
 ### Running the Application
 
 1. Run database migration
 
-npx prisma migrate dev
+`npx prisma migrate dev`
 
 2. start the server
 
