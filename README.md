@@ -1,6 +1,6 @@
 # NestJS GraphQL Application
 
-This is a sample NestJS application with GraphQL integration. It provides endpoints for user authentication and user management using GraphQL.
+This is a  NestJS application with GraphQL integration. It provides endpoints for user authentication and user management using GraphQL.
 
 ## Getting Started
 
